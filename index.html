@@ -10,7 +10,14 @@
     <script type='text/javascript' src='http://api.tomtom.com/maps-sdk-js/4.15.0/examples/sdk/tomtom.min.js'></script>
 </head>
 <body class='use-all-space'>
-    <div id='map' class='use-all-space'></div>
+    <!--<div id='map' class='use-all-space'></div>-->
+    
+    <ul id="places"></ul>
+    <p>Click the "Search " button to display the interesting places nearby:</p>
+    <button id="btn1" name="Location" type="submit" value="HTML">HTML</button>
+    <button onclick="POISearch()">Search</button>
+    <label> Start Location</label>
+    <input type="text" id = "start"/>
     <script>
         // Define your product name and version
         //tomtom.setProductInfo('Travamigo', '1.0SNAPSHOT');
@@ -46,20 +53,49 @@
                 map.fitBounds(route.getBounds(), {padding: [5, 5]});
             });*/
         console.log("he");
-        var startPoint = "pizza";
+        const ul = document.getElementById('places');
         
-        function POISearch() {
-            var xhttp = new XMLHttpRequest();
-            var url = "https://api.tomtom.com/search/2/poiSearch/" + startPoint + ".json?key=XM8WGdX4Axb7GbmW3OJ2uA8qj5fxbRlN&limit=5&lat=37.76&lon=-122.47&radius=200000";
-            console.log(url);
-            xhttp.open("GET", url, true);
-            xhttp.setRequestHeader("Content-type", "application/json");
-            xhttp.send();
-            //var response = JSON.parse(xhttp.responseText);
-            console.log(xhttp.responseText);
+        function createNode(element) {
+              return document.createElement(element);
         }
 
-        POISearch();        
+        function append(parent, el) {
+            return parent.appendChild(el);
+        }
+
+        function POISearch() {
+            //var xhttp = new XMLHttpRequest();
+            var startPoint = document.getElementById('start').value;
+            var url = "https://api.tomtom.com/search/2/poiSearch/" + startPoint + ".json?key=XM8WGdX4Axb7GbmW3OJ2uA8qj5fxbRlN&limit=5&lat=37.76&lon=-122.47&radius=200000";
+            console.log(url);
+            //xhttp.open("GET", url, true);
+            //xhttp.setRequestHeader("Content-type", "application/json");
+            //xhttp.send();
+            //var response = JSON.parse(xhttp.responseText);
+            //console.log(xhttp.responseText);
+            fetch(url)
+                .then((resp) => resp.json())
+                .then(function(data){
+                    console.log(data);
+                    let places = data.results;
+                   return places.map(function(place){
+                        let li = createNode('li');
+                        let span = createNode('span');
+                        let url = createNode('link');
+                        span.innerHTML = `${place.poi.name}`;
+                        link = place.poi.url;
+                        append(li,span);
+                        append(li, url);
+                        append(ul, li);
+
+                    })
+                })
+                .catch(function(error) {
+                    console.log(error);
+                  }); 
+        }
+
+        //POISearch();        
 
     </script>
 </body>
